@@ -7,6 +7,7 @@ import toast, { Toaster } from "react-hot-toast";
 export default function AddEvent() {
   const { theme } = useTheme();
   const [formData, setFormData] = useState({
+    courseType: "",
     eventName: "",
     description: "",
     eventType: "",
@@ -22,22 +23,33 @@ export default function AddEvent() {
   const [preview, setPreview] = useState(null);
   const today = new Date().toISOString().split("T")[0];
 
-  // ✅ Handle text/select changes
+  // 🔹 Event list by course
+  const tacEvents = ["Tackathon", "Tackathon Pro", "Unfiltered Friday", "TAC Frontlines"];
+  const dmEvents = ["Unfiltered Friday", "TAC Frontlines", "Revenue Challenge"];
+
+  const getEventOptions = () => {
+    if (formData.courseType === "TAC Suite") return tacEvents;
+    if (formData.courseType === "Digital Marketing") return dmEvents;
+    if (formData.courseType === "Both") return [...new Set([...tacEvents, ...dmEvents])];
+    return [];
+  };
+
+  // ✅ Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Reset courseEnrolled if eventType changes
-    if (name === "eventType") {
+    // Reset dependent fields when course type changes
+    if (name === "courseType") {
       setFormData((prev) => ({
         ...prev,
-        eventType: value,
-        courseEnrolled: "", // reset dependent field
+        courseType: value,
+        eventName: "",
       }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
-  // ✅ Handle file selection
+  // ✅ Handle file upload
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -51,10 +63,10 @@ export default function AddEvent() {
     e.preventDefault();
 
     if (
+      !formData.courseType ||
       !formData.eventName ||
       !formData.description ||
       !formData.eventType ||
-      !formData.courseEnrolled ||
       !formData.date ||
       !formData.time ||
       !formData.host ||
@@ -72,8 +84,9 @@ export default function AddEvent() {
     toast.success("🎉 Event created successfully!");
     console.log("Event Data Submitted:", formData);
 
-    // ✅ Reset form
+    // Reset form
     setFormData({
+      courseType: "",
       eventName: "",
       description: "",
       eventType: "",
@@ -86,77 +99,66 @@ export default function AddEvent() {
       eventPoster: null,
     });
     setPreview(null);
-
-    const fileInput = document.getElementById("eventPosterInput");
-    if (fileInput) fileInput.value = "";
+    document.getElementById("eventPosterInput").value = "";
   };
 
-  // ✅ Course options based on Event Type
-  const onlineCourses = [
-    "Editing & Designing",
-    "Editing",
-    "Designing",
-    "TAC Suite",
-    "Digital Marketing",
-  ];
-  const offlineCourses = ["TAC Suite", "Digital Marketing"];
-
-  const courseOptions =
-    formData.eventType === "Online" ? onlineCourses : formData.eventType === "Offline" ? offlineCourses : [];
+  const eventOptions = getEventOptions();
 
   return (
     <ClientLayout>
       <div className="container py-4 course-form">
         <Toaster position="top-right" />
         <div className="card p-4 shadow-sm border-0">
-          {/* Header with breadcrumb link */}
-<div className="d-flex justify-content-between align-items-center mb-4">
-  <h4
-    className="fw-bold mb-0"
-    style={{ color: "var(--primary, #FEB614)", fontWeight: 500 }}
-  >
-    Add New Event
-  </h4>
-  <div className="text-end">
-    <a
-      href="/Events/View"
-      className="text-decoration-none me-1"
-      style={{
-        color: theme === "dark" ? "#aaa" : "#555",
-      }}
-    >
-      Events
-    </a>
-    <span style={{ color: theme === "dark" ? "#aaa" : "#777" }}>/</span>
-    <span
-      className="ms-1 fw-semibold"
-      style={{
-        color: "var(--primary, #FEB614)",
-      }}
-    >
-      Add Event
-    </span>
-  </div>
-</div>
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <h4 className="fw-bold mb-0" style={{ color: "var(--primary, #FEB614)" }}>
+              Add New Event
+            </h4>
+          </div>
+
           <form onSubmit={handleSubmit}>
             <div className="row g-3">
-              {/* Event Name */}
+              {/* 🔹 Course Type */}
+              <div className="col-md-6">
+                <label className="form-label">
+                  Course Type <span className="text-danger">*</span>
+                </label>
+                <select
+                  name="courseType"
+                  value={formData.courseType}
+                  onChange={handleChange}
+                  className="form-select"
+                  required
+                >
+                  <option value="">Select Course Type</option>
+                  <option value="TAC Suite">TAC Suite</option>
+                  <option value="Digital Marketing">Digital Marketing</option>
+                  <option value="Both">Both</option>
+                </select>
+              </div>
+
+              {/* 🔹 Event Name (Dynamic by Course) */}
               <div className="col-md-6">
                 <label className="form-label">
                   Event Name <span className="text-danger">*</span>
                 </label>
-                <input
-                  type="text"
+                <select
                   name="eventName"
                   value={formData.eventName}
                   onChange={handleChange}
-                  placeholder="Enter event name"
-                  className="form-control"
+                  className="form-select"
+                  disabled={!formData.courseType}
                   required
-                />
+                >
+                  <option value="">Select Event</option>
+                  {eventOptions.map((event, i) => (
+                    <option key={i} value={event}>
+                      {event}
+                    </option>
+                  ))}
+                </select>
               </div>
 
-              {/* Host / Speaker */}
+              {/* 🔹 Host / Speaker */}
               <div className="col-md-6">
                 <label className="form-label">
                   Host / Speaker <span className="text-danger">*</span>
@@ -172,7 +174,7 @@ export default function AddEvent() {
                 />
               </div>
 
-              {/* Description */}
+              {/* 🔹 Description */}
               <div className="col-12">
                 <label className="form-label">
                   Description <span className="text-danger">*</span>
@@ -188,7 +190,7 @@ export default function AddEvent() {
                 ></textarea>
               </div>
 
-              {/* Event Type */}
+              {/* 🔹 Event Type */}
               <div className="col-md-4">
                 <label className="form-label">
                   Event Type <span className="text-danger">*</span>
@@ -206,59 +208,29 @@ export default function AddEvent() {
                 </select>
               </div>
 
-              {/* Course Enrolled */}
+              {/* 🔹 Event Link (Online only) */}
               <div className="col-md-4">
-                <label className="form-label">
-                  Course Enrolled <span className="text-danger">*</span>
-                </label>
-                <select
-                  name="courseEnrolled"
-                  value={formData.courseEnrolled}
+                <label className="form-label">Event Link</label>
+                <input
+                  type="url"
+                  name="eventLink"
+                  value={formData.eventLink}
                   onChange={handleChange}
-                  className="form-select"
-                  disabled={!formData.eventType}
-                  required
-                >
-                  <option value="">Select Course</option>
-                  {courseOptions.map((course, i) => (
-                    <option key={i} value={course}>
-                      {course}
-                    </option>
-                  ))}
-                </select>
+                  placeholder="https://example.com/meet"
+                  className="form-control"
+                  disabled={formData.eventType !== "Online"}
+                  style={{
+                    backgroundColor:
+                      formData.eventType !== "Online"
+                        ? theme === "dark"
+                          ? "#2a2a2a"
+                          : "#f1f1f1"
+                        : "",
+                  }}
+                />
               </div>
 
-              {/* Event Link */}
-             {/* Event Link */}
-<div className="col-md-4">
-  <label className="form-label">
-    Event Link <span className="text-danger">*</span>
-  </label>
-  <input
-    type="url"
-    name="eventLink"
-    value={formData.eventLink}
-    onChange={handleChange}
-    placeholder="https://example.com/meet"
-    className="form-control"
-    disabled={formData.eventType !== "Online"}
-    style={{
-      backgroundColor:
-        formData.eventType !== "Online"
-          ? theme === "dark"
-            ? "#2a2a2a"
-            : "#f1f1f1"
-          : "",
-    }}
-  />
-  <small className="text-muted d-block mt-1"
-    style={{
-      minHeight: "18px", 
-      visibility: formData.eventType !== "Online" ? "visible" : "hidden", }} >(Enabled only for Online events)
-  </small>
-</div>
-
-              {/* Date */}
+              {/* 🔹 Date */}
               <div className="col-md-4">
                 <label className="form-label">
                   Date <span className="text-danger">*</span>
@@ -274,7 +246,7 @@ export default function AddEvent() {
                 />
               </div>
 
-              {/* Time */}
+              {/* 🔹 Time */}
               <div className="col-md-4">
                 <label className="form-label">
                   Time <span className="text-danger">*</span>
@@ -289,7 +261,7 @@ export default function AddEvent() {
                 />
               </div>
 
-              {/* Duration */}
+              {/* 🔹 Duration */}
               <div className="col-md-4">
                 <label className="form-label">Duration</label>
                 <input
@@ -302,7 +274,7 @@ export default function AddEvent() {
                 />
               </div>
 
-              {/* Event Poster */}
+              {/* 🔹 Poster Upload */}
               <div className="col-12">
                 <label className="form-label">
                   Event Poster / Banner <span className="text-danger">*</span>

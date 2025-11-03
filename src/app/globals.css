@@ -1829,7 +1829,6 @@ body[data-theme="dark"] .progress-text {
   box-shadow: none !important;
 }
 
-/* Keep yellow highlight only when actually active */
 .course-card.active {
   border-color: var(--primary) !important;
   background-color: rgba(254, 182, 20, 0.05);
@@ -1842,4 +1841,25 @@ body[data-theme="dark"] .progress-text {
 }
 .progress-fill {
   transition: stroke-dashoffset 0.5s ease, stroke 0.3s ease;
+}
+/* Add events page */
+
+/* Default (light theme) */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(0); /* normal black icon */
+  cursor: pointer;
+  opacity: 0.8;
+  transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+input[type="date"]:hover::-webkit-calendar-picker-indicator,
+input[type="time"]:hover::-webkit-calendar-picker-indicator {
+  opacity: 1;
+}
+
+body[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator,
+body[data-theme="dark"] input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(1.8); /* turns icon white */
+  opacity: 0.9;
 }

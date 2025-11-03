@@ -183,14 +183,15 @@ export default function Startbar({ isOpen: initialOpen = true }) {
               </li>
 
               
-                <li className="nav-item">
-                <Link href="/students" className="nav-link d-flex align-items-center w-100">
-                  <div className="left-content">
-                    <i className="bi bi-people"></i>
-                    {isOpen && <span>Tackathons</span>}
-                  </div>
-                </Link>
-              </li>
+                 <li className="nav-item">
+  <Link href="/Tackathons" className="nav-link d-flex align-items-center w-100">
+    <div className="left-content">
+      <i className="bi bi-people"></i>
+      {isOpen && <span>Tackathons</span>}
+    </div>
+  </Link>
+</li>
+
               
  <li className="nav-item">
                 <Link href="/students" className="nav-link d-flex align-items-center w-100">
