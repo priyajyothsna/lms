@@ -1,11 +1,17 @@
 "use client";
 
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import { useEffect } from "react";
 import ClientLayout from "../components/Clientlayout/page";
-import { useTheme } from "../components/Layout/page"; // ✅ import your theme hook
+import { useTheme } from "../components/Layout/page";
 
 export default function DashboardPage() {
-  const { theme } = useTheme(); // ✅ get the current theme from context
+  const { theme } = useTheme();
+
+  useEffect(() => {
+    import("bootstrap/dist/js/bootstrap.bundle.min.js")
+      .then(() => console.log("Bootstrap loaded successfully"))
+      .catch((err) => console.error("Bootstrap loading failed:", err));
+  }, []);
 
   return (
     <ClientLayout>
@@ -65,13 +71,14 @@ export default function DashboardPage() {
 
               {/* ===== Week Schedule Section ===== */}
               <div
-  className={`card mt-4 shadow-sm border-0 ${
-    theme === "dark" ? "bg-dark text-light" : "bg-light text-dark"
-  }`}
->
+                className={`card mt-4 shadow-sm border-0 ${
+                  theme === "dark"
+                    ? "bg-dark text-light"
+                    : "bg-light text-dark"
+                }`}
+              >
                 <div className="card-header border-0">
-                 <h4 className="card-title text-warning">Week Schedule</h4>
-
+                  <h4 className="card-title text-warning">Week Schedule</h4>
                 </div>
                 <div className="card-body">
                   <div className="accordion" id="weekSchedule">
@@ -102,7 +109,10 @@ export default function DashboardPage() {
                         body: "Hands-on project and Q&A.",
                       },
                     ].map((session) => (
-                      <div className="accordion-item mb-2 border-0" key={session.id}>
+                      <div
+                        className="accordion-item mb-2 border-0"
+                        key={session.id}
+                      >
                         <h2 className="accordion-header">
                           <button
                             className={`accordion-button collapsed fw-semibold ${
@@ -141,15 +151,15 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* ===== Right part - 4 columns (NO CHANGES DONE HERE) ===== */}
           <div className="col-md-4">
             <div className="dashboard-right">
-              
               {/* Events Card */}
               <div className="right-card mb-3">
                 <div className="card-header">
                   <h3>Events</h3>
-                  <a href="#" className="view-link">View →</a>
+                  <a href="#" className="view-link">
+                    View →
+                  </a>
                 </div>
 
                 <ul className="event-list">
@@ -184,7 +194,9 @@ export default function DashboardPage() {
               <div className="right-card mb-3">
                 <div className="card-header">
                   <h3>Leaderboard</h3>
-                  <a href="#" className="view-link">View →</a>
+                  <a href="#" className="view-link">
+                    View →
+                  </a>
                 </div>
                 <div className="leaderboard-content">
                   <strong>Bronze IV</strong>
@@ -196,7 +208,8 @@ export default function DashboardPage() {
               {/* Learning Consistency Card */}
               <div className="right-card mb-3">
                 <div className="card-header">
-                  Learning Consistency <span className="goal-label">Goal 🔥 90</span>
+                  Learning Consistency{" "}
+                  <span className="goal-label">Goal 🔥 90</span>
                 </div>
                 <div className="consistency-content">
                   <div>
